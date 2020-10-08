@@ -4,7 +4,6 @@ const Koa = require('koa');
 const Router = require('koa-router');
 const WS = require('ws');
 
-
 const app = new Koa();
 
 app.use(async (ctx, next) => {
@@ -34,7 +33,6 @@ app.use(async (ctx, next) => {
     if (ctx.request.get('Access-Control-Request-Headers')) {
       ctx.response.set('Access-Control-Allow-Headers', ctx.request.get('Access-Control-Request-Headers'));
     }
-
     ctx.response.status = 204;
   }
 });
@@ -42,91 +40,100 @@ app.use(async (ctx, next) => {
 const router = new Router();
 const server = http.createServer(app.callback());
 const wsServer = new WS.Server({ server });
-let delUser;
 
 wsServer.on('connection', (ws, req) => {
-
   ws.on('message', async (msg) => {
     const message = JSON.parse(msg);
     if (message.type === 'create') {
-      ws.send(JSON.stringify({ type: 'received', data: {
-        date: new Date().toLocaleString(),
-        info: 'Received "Create command"',
-        id: 'Id will be assign'
-      }  
-    }));
-      setTimeout( async () => {
+      ws.send(JSON.stringify({
+        type: 'received', data: {
+          date: new Date().toLocaleString(),
+          info: 'Received "Create command"',
+          id: 'Id will be assign'
+        }
+      }));
+      setTimeout(async () => {
         const instance = new Instance();
         await instance.save();
         const instances = await Instance.getAll();
-        ws.send(JSON.stringify({ type: 'created', data: {
-          instances,
-          date: new Date().toLocaleString(),
-          info: 'Created',
-          id: instance.id
-        } }));
+        ws.send(JSON.stringify({
+          type: 'created', data: {
+            instances,
+            date: new Date().toLocaleString(),
+            info: 'Created',
+            id: instance.id
+          }
+        }));
       }, 20000)
       return
 
     } else if (message.type === 'delete') {
-      ws.send(JSON.stringify({ type: 'received', data: {
-        date: new Date().toLocaleString(),
-        info: 'Received "Delete command"',
-        id: message.data.id
-      }  
-    }));
+      ws.send(JSON.stringify({
+        type: 'received', data: {
+          date: new Date().toLocaleString(),
+          info: 'Received "Delete command"',
+          id: message.data.id
+        }
+      }));
       setTimeout(async () => {
         await Instance.delete(message.data.id);
         const instances = await Instance.getAll();
-        ws.send(JSON.stringify({ type: 'removed', data: {
-          instances,
-          date: new Date().toLocaleString(),
-          info: 'Removed',
-          id: message.data.id
-        } }));
+        ws.send(JSON.stringify({
+          type: 'removed', data: {
+            instances,
+            date: new Date().toLocaleString(),
+            info: 'Removed',
+            id: message.data.id
+          }
+        }));
       }, 20000)
       return
 
     } else if (message.type === 'start') {
-      ws.send(JSON.stringify({ type: 'received', data: {
-        date: new Date().toLocaleString(),
-        info: 'Received "Start command"',
-        id: message.data.id
-      }  
-    }));
-      setTimeout( async () => {
+      ws.send(JSON.stringify({
+        type: 'received', data: {
+          date: new Date().toLocaleString(),
+          info: 'Received "Start command"',
+          id: message.data.id
+        }
+      }));
+      setTimeout(async () => {
         await Instance.start(message.data.id);
         const instances = await Instance.getAll();
-        ws.send(JSON.stringify({ type: 'startted', data: {
-          instances,
-          date: new Date().toLocaleString(),
-          info: 'Started',
-          id: message.data.id
-        } }));
+        ws.send(JSON.stringify({
+          type: 'startted', data: {
+            instances,
+            date: new Date().toLocaleString(),
+            info: 'Started',
+            id: message.data.id
+          }
+        }));
       }, 20000)
       return
 
     } else if (message.type === 'stop') {
-      ws.send(JSON.stringify({ type: 'received', data: {
-        date: new Date().toLocaleString(),
-        info: 'Received "Stop command"',
-        id: message.data.id
-      }  
-    }));
-      setTimeout( async () => {
+      ws.send(JSON.stringify({
+        type: 'received', data: {
+          date: new Date().toLocaleString(),
+          info: 'Received "Stop command"',
+          id: message.data.id
+        }
+      }));
+      setTimeout(async () => {
         await Instance.stop(message.data.id);
         const instances = await Instance.getAll();
-        ws.send(JSON.stringify({ type: 'stopped', data: {
-          instances,
-          date: new Date().toLocaleString(),
-          info: 'Stopped',
-          id: message.data.id
-        } }));
+        ws.send(JSON.stringify({
+          type: 'stopped', data: {
+            instances,
+            date: new Date().toLocaleString(),
+            info: 'Stopped',
+            id: message.data.id
+          }
+        }));
       }, 20000)
       return
     }
   });
-
 });
 
 
